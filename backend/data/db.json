@@ -1,0 +1,159 @@
+{
+  "users": [
+    {
+      "_id": "wmdo0awi6",
+      "id": "u_admin1",
+      "createdAt": "2026-05-29T08:35:56.352Z",
+      "email": "admin@campusthread.edu",
+      "password": "$2a$10$r5pFoy.mOTP8qaU.8ExWRu5bHWEe.78vtH2MNdaKRkigfdTeLAhSO",
+      "name": "Alex Rivera",
+      "role": "Super Admin"
+    },
+    {
+      "_id": "5wcqq3rbh",
+      "id": "u_student1",
+      "createdAt": "2026-05-29T08:35:56.354Z",
+      "email": "student@campusthread.edu",
+      "password": "$2a$10$r5pFoy.mOTP8qaU.8ExWRu5bHWEe.78vtH2MNdaKRkigfdTeLAhSO",
+      "name": "Jordan Finch",
+      "role": "Student User"
+    },
+    {
+      "_id": "glgsnce3j",
+      "id": "3wzkupu39",
+      "createdAt": "2026-05-29T08:45:59.318Z",
+      "email": "subhambitofficial@gmail.com",
+      "name": "subham",
+      "password": "$2a$10$CCVlvHiXPfi2biyBZhvuSe/XED/L2nGnBeAxbJVCPWJe95eZInw7u",
+      "role": "Student User"
+    },
+    {
+      "_id": "enm69oqzb",
+      "id": "enm69oqzb",
+      "createdAt": "2026-06-13T18:35:15.440Z",
+      "email": "sk6971233@gmail.com",
+      "name": "SUBH",
+      "password": "$2a$10$RcTugIg3V8akeypIWDBNlOUIiuC8mDHF9EswkE9ongAulT4j2yxnW",
+      "role": "Student User"
+    },
+    {
+      "_id": "tiwck0on9",
+      "id": "tiwck0on9",
+      "createdAt": "2026-06-20T18:35:31.329Z",
+      "email": "new_student_1781980531194@campusthread.edu",
+      "name": "New Student Test",
+      "password": "$2a$10$fBiZJepKO3.ugOUIWmUpJOia7F6K2QNoW2ZcreBsZwZ4yFl2awP7m",
+      "role": "Student User"
+    },
+    {
+      "_id": "91hzlrqyu",
+      "id": "91hzlrqyu",
+      "createdAt": "2026-06-20T18:36:25.027Z",
+      "email": "new_student_1781980584877@campusthread.edu",
+      "name": "New Student Test",
+      "password": "$2a$10$cBOuuY39jzSn8kbm5dpapuyVpxW0mrkQ8MuSxS1GZhq8zAPaeB/G2",
+      "role": "Student User"
+    }
+  ],
+  "clubs": [],
+  "events": [],
+  "merchProducts": [],
+  "merchOrders": [],
+  "registrations": [],
+  "studentProfiles": [
+    {
+      "_id": "qf1lpqbu8",
+      "id": "brn6lpauw",
+      "createdAt": "2026-05-29T08:35:56.355Z",
+      "studentId": "u_student1",
+      "name": "Jordan Finch",
+      "badges": [
+        "Freshman Pioneer",
+        "Culture Explorer"
+      ],
+      "certificates": [
+        {
+          "id": "cert_hack123",
+          "eventName": "HackSprint 2026",
+          "issuedBy": "ByteClub Coding Society",
+          "issueDate": "2026-05-15",
+          "secureHash": "CT-A89E-77B2"
+        }
+      ],
+      "attendedEvents": [
+        "HackSprint 2026"
+      ],
+      "clubMemberships": [
+        "ByteClub"
+      ]
+    },
+    {
+      "_id": "bhbjt5twe",
+      "id": "33k9jot40",
+      "createdAt": "2026-05-29T08:45:59.319Z",
+      "studentId": "3wzkupu39",
+      "name": "subham",
+      "badges": [
+        "Freshman Badge",
+        "Trendsetter"
+      ],
+      "certificates": [],
+      "attendedEvents": [
+        "verve"
+      ],
+      "clubMemberships": [],
+      "updatedAt": "2026-06-06T14:23:13.309Z"
+    },
+    {
+      "_id": "i9jef7vj3",
+      "id": "i9jef7vj3",
+      "createdAt": "2026-06-13T18:35:15.441Z",
+      "studentId": "enm69oqzb",
+      "name": "SUBH",
+      "badges": [
+        "Freshman Badge"
+      ],
+      "certificates": [],
+      "attendedEvents": [],
+      "clubMemberships": []
+    },
+    {
+      "_id": "kyasevn5z",
+      "id": "kyasevn5z",
+      "createdAt": "2026-06-20T18:35:31.330Z",
+      "studentId": "tiwck0on9",
+      "name": "New Student Test",
+      "badges": [
+        "Freshman Badge"
+      ],
+      "certificates": [],
+      "attendedEvents": [],
+      "clubMemberships": []
+    },
+    {
+      "_id": "b0zi0rct4",
+      "id": "b0zi0rct4",
+      "createdAt": "2026-06-20T18:36:25.028Z",
+      "studentId": "91hzlrqyu",
+      "name": "New Student Test",
+      "badges": [
+        "Freshman Badge"
+      ],
+      "certificates": [],
+      "attendedEvents": [],
+      "clubMemberships": []
+    }
+  ],
+  "certificates": [],
+  "notifications": [
+    {
+      "_id": "welcome",
+      "id": "welcome",
+      "createdAt": "2026-06-30T14:52:21.748Z",
+      "title": "Welcome to CampusThread",
+      "content": "Experience the digital layer of modern campus culture. Explore clubs, customize event microsites, and secure limited drops.",
+      "type": "general",
+      "targetId": "welcome"
+    }
+  ]
+}

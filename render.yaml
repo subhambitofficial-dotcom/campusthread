@@ -1,0 +1,48 @@
+# render.yaml – Render.com deployment config for CampusThread (full‑stack)
+
+services:
+  # ---------- Backend API ----------
+  - type: web
+    name: campus-backend
+    env: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: MONGODB_URI
+        value: "<YOUR_MONGODB_URI>"
+      - key: JWT_SECRET
+        value: "<YOUR_JWT_SECRET>"
+    # Render injects $PORT automatically; the server uses it.
+
+  # ---------- Frontend (Next.js) ----------
+  - type: web
+    name: campus-frontend
+    env: node
+    region: oregon
+    plan: free
+    branch: main
+    buildCommand: npm install && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NODE_VERSION
+        value: "20"
+      - key: NEXT_PUBLIC_API_URL
+        # Reference the backend service URL provided by Render at runtime
+        value: "${RENDER_EXTERNAL_URL}/api"
+    # Render will expose the frontend on its own URL.
+
+# Optional: Add a static site service if you prefer exporting Next.js as static HTML.
+# Uncomment the block below to use the static export approach.
+#  - type: static
+#    name: campus-frontend-static
+#    env: node
+#    region: oregon
+#    plan: free
+#    branch: main
+#    buildCommand: npm install && npm run build && npm run export
+#    staticPublishPath: out
