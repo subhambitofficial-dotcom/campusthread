@@ -17,6 +17,7 @@ interface JsonDbSchema {
   studentProfiles: any[];
   certificates: any[];
   notifications: any[];
+  reels: any[];
 }
 
 const DEFAULT_DB: JsonDbSchema = {
@@ -28,7 +29,8 @@ const DEFAULT_DB: JsonDbSchema = {
   registrations: [],
   studentProfiles: [],
   certificates: [],
-  notifications: []
+  notifications: [],
+  reels: []
 };
 
 // Check if directories exist, create if not
@@ -43,7 +45,7 @@ if (!fs.existsSync(JSON_DB_PATH)) {
 let jsonDbCache: JsonDbSchema = DEFAULT_DB;
 try {
   const content = fs.readFileSync(JSON_DB_PATH, 'utf-8');
-  jsonDbCache = JSON.parse(content);
+  jsonDbCache = { ...DEFAULT_DB, ...JSON.parse(content) };
 } catch (error) {
   jsonDbCache = { ...DEFAULT_DB };
 }
@@ -256,6 +258,17 @@ const NotificationSchema = new mongoose.Schema({
   updatedAt: { type: String }
 }, { versionKey: false });
 
+const ReelSchema = new mongoose.Schema({
+  _id: { type: String, required: true },
+  id: { type: String, required: true },
+  title: { type: String, required: true, trim: true },
+  videoUrl: { type: String, required: true, trim: true },
+  clubId: { type: String, trim: true },
+  postedBy: { type: String, required: true, trim: true },
+  likes: { type: [String], default: [] },
+  createdAt: { type: String, required: true, default: () => new Date().toISOString() }
+}, { versionKey: false });
+
 
 const getModel = (name: string, schema: mongoose.Schema) => {
   if (mongoose.models[name]) {
@@ -273,7 +286,8 @@ const modelsMap: Record<keyof JsonDbSchema, mongoose.Model<any>> = {
   registrations: getModel('Registration', RegistrationSchema),
   studentProfiles: getModel('StudentProfile', StudentProfileSchema),
   certificates: getModel('Certificate', CertificateSchema),
-  notifications: getModel('Notification', NotificationSchema)
+  notifications: getModel('Notification', NotificationSchema),
+  reels: getModel('Reel', ReelSchema)
 };
 
 // Generic Collection Manager for Local JSON database, mirroring standard DB operations
@@ -398,5 +412,6 @@ export const db = {
   registrations: new LocalCollection<any>('registrations'),
   studentProfiles: new LocalCollection<any>('studentProfiles'),
   certificates: new LocalCollection<any>('certificates'),
-  notifications: new LocalCollection<any>('notifications')
+  notifications: new LocalCollection<any>('notifications'),
+  reels: new LocalCollection<any>('reels')
 };

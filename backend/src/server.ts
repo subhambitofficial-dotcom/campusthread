@@ -12,6 +12,7 @@ import clubRoutes from './routes/clubs';
 import eventRoutes from './routes/events';
 import merchRoutes from './routes/merch';
 import paymentRoutes from './routes/payments';
+import reelsRoutes from './routes/reels';
 
 // Load Environment Variables
 dotenv.config();
@@ -44,6 +45,7 @@ app.use('/api/clubs', clubRoutes);
 app.use('/api/events', eventRoutes);
 app.use('/api/merch', merchRoutes);
 app.use('/api/payments', paymentRoutes);
+app.use('/api/reels', reelsRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/admin/delete', adminDeleteRoutes);
 

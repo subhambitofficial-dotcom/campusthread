@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../utils/api';
 import Link from 'next/link';
-import { Radio, Users, Calendar, ShoppingBag, PlusCircle, Sparkles, FolderSync, ShieldAlert, Award, FileText, CheckCircle2, X, Download, Landmark, Shirt } from 'lucide-react';
+import { Radio, Users, Calendar, ShoppingBag, PlusCircle, Sparkles, FolderSync, ShieldAlert, Award, FileText, CheckCircle2, X, Download, Landmark, Shirt, Film } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [dbStats, setDbStats] = useState<any>({
@@ -52,6 +52,14 @@ export default function AdminDashboard() {
   // Form Loading states
   const [actionLoading, setActionLoading] = useState(false);
 
+  // Reels Form States
+  const [showReelModal, setShowReelModal] = useState(false);
+  const [clubs, setClubs] = useState<any[]>([]);
+  const [reelTitle, setReelTitle] = useState('');
+  const [reelVideoUrl, setReelVideoUrl] = useState('');
+  const [reelClubId, setReelClubId] = useState('');
+  const [videoSourceTab, setVideoSourceTab] = useState<'url' | 'upload'>('url');
+
   const fetchAdminStats = async () => {
     try {
       const stats = await api.get('/admin/stats');
@@ -65,6 +73,13 @@ export default function AdminDashboard() {
         setUsers(usersList);
       } catch (userErr) {
         console.error('Failed to load registered users:', userErr);
+      }
+
+      try {
+        const clubsList = await api.get('/clubs');
+        setClubs(clubsList);
+      } catch (clubErr) {
+        console.error('Failed to load clubs list:', clubErr);
       }
 
       // Fetch notifications or use dynamic summary
@@ -177,6 +192,38 @@ export default function AdminDashboard() {
     }
   };
 
+  // Submit Reel Posting
+  const handlePostReel = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!reelTitle || !reelVideoUrl) {
+      alert('Please provide a caption and select/upload a video.');
+      return;
+    }
+
+    setActionLoading(true);
+    try {
+      await api.post('/reels', {
+        title: reelTitle,
+        videoUrl: reelVideoUrl,
+        clubId: reelClubId || null
+      });
+
+      alert('Campus reel published successfully!');
+      setShowReelModal(false);
+
+      // Reset Reel Form
+      setReelTitle('');
+      setReelVideoUrl('');
+      setReelClubId('');
+
+      fetchAdminStats();
+    } catch (err: any) {
+      alert(err.message || 'Failed to post reel.');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   // Export Unified Excel (CSV) Report
   const handleExportExcel = async () => {
     try {
@@ -271,6 +318,13 @@ export default function AdminDashboard() {
             className="flex items-center gap-1.5 px-5 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs uppercase tracking-wider transition-all"
           >
             <Shirt className="w-4 h-4 text-brand-pink" /> Launch Merch
+          </button>
+
+          <button 
+            onClick={() => setShowReelModal(true)}
+            className="flex items-center gap-1.5 px-5 py-3 rounded-full bg-white/5 hover:bg-white/10 border border-white/10 text-white font-bold text-xs uppercase tracking-wider transition-all"
+          >
+            <Film className="w-4 h-4 text-brand-gold" /> Post Campus Reel
           </button>
 
           <Link 
@@ -732,6 +786,127 @@ export default function AdminDashboard() {
                   className="w-1/2 py-3.5 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-pink text-black font-extrabold text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(0,240,255,0.2)]"
                 >
                   {actionLoading ? 'LAUNCHING DROP...' : 'Publish Merch Drop'}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* ================= POST REEL MODAL OVERLAY ================= */}
+      {showReelModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center px-4 bg-black/85 backdrop-blur-md">
+          <div className="w-full max-w-xl glass p-8 rounded-3xl border border-white/10 shadow-2xl relative overflow-y-auto max-h-[90vh] text-left">
+            <button 
+              onClick={() => setShowReelModal(false)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg bg-white/5 border border-white/10 text-white hover:text-brand-pink transition-colors"
+            >
+              <X className="w-5 h-5" />
+            </button>
+
+            <h2 className="text-2xl font-black text-white flex items-center gap-2 mb-2">
+              <Film className="w-6 h-6 text-brand-gold" /> Post a Campus Reel / Short
+            </h2>
+            <p className="text-xs text-white/40 mb-6">Drop a vertical video highlight of campus activities, coding sprints, or cultural gigs.</p>
+
+            <form onSubmit={handlePostReel} className="flex flex-col gap-5">
+              <div>
+                <label className="block text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1.5">Caption / Title *</label>
+                <input 
+                  type="text" 
+                  value={reelTitle}
+                  onChange={(e) => setReelTitle(e.target.value)}
+                  placeholder="e.g. Jamming session in the cafeteria! 🎸🔥" 
+                  className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-sm focus:outline-none focus:border-brand-cyan"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1.5">Associated Club (Optional)</label>
+                <select
+                  value={reelClubId}
+                  onChange={(e) => setReelClubId(e.target.value)}
+                  className="w-full px-4 py-3 rounded-xl bg-card border border-white/10 text-white text-xs focus:outline-none focus:border-brand-cyan"
+                >
+                  <option value="">No Club (Independent Poster)</option>
+                  {clubs.map(club => (
+                    <option key={club.id || club._id} value={club.id || club._id}>
+                      {club.name}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div>
+                <label className="block text-[10px] font-bold text-white/50 uppercase tracking-widest mb-2">Video Source *</label>
+                <div className="flex gap-2 mb-3 bg-white/5 p-1 rounded-lg border border-white/5 w-fit">
+                  <button 
+                    type="button"
+                    onClick={() => setVideoSourceTab('url')}
+                    className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${videoSourceTab === 'url' ? 'bg-white text-black' : 'text-white/60 hover:text-white'}`}
+                  >
+                    Video URL
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setVideoSourceTab('upload')}
+                    className={`px-3 py-1.5 rounded-md text-[10px] font-bold uppercase tracking-wider transition-all ${videoSourceTab === 'upload' ? 'bg-white text-black' : 'text-white/60 hover:text-white'}`}
+                  >
+                    Upload MP4 File
+                  </button>
+                </div>
+
+                {videoSourceTab === 'url' ? (
+                  <input 
+                    type="text" 
+                    value={reelVideoUrl}
+                    onChange={(e) => setReelVideoUrl(e.target.value)}
+                    placeholder="https://example.com/video.mp4" 
+                    className="w-full px-4 py-3 rounded-xl bg-white/5 border border-white/10 text-white placeholder-white/20 text-xs focus:outline-none focus:border-brand-cyan"
+                    required={videoSourceTab === 'url'}
+                  />
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    <input 
+                      type="file" 
+                      accept="video/mp4,video/quicktime,video/webm"
+                      onChange={(e) => {
+                        const file = e.target.files?.[0];
+                        if (file) {
+                          if (file.size > 20 * 1024 * 1024) {
+                            alert('Video size must be less than 20MB.');
+                            e.target.value = '';
+                            return;
+                          }
+                          const reader = new FileReader();
+                          reader.onloadend = () => {
+                            if (typeof reader.result === 'string') setReelVideoUrl(reader.result);
+                          };
+                          reader.readAsDataURL(file);
+                        }
+                      }}
+                      className="w-full text-xs text-white/50 file:mr-4 file:py-2.5 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-white/10 file:text-white hover:file:bg-white/20"
+                    />
+                    <p className="text-[10px] text-white/30">Max size: 20MB. Keep video short (10-15s) for optimal storage.</p>
+                  </div>
+                )}
+              </div>
+
+              <div className="flex gap-3 pt-4">
+                <button 
+                  type="button"
+                  onClick={() => setShowReelModal(false)}
+                  className="w-1/2 py-3.5 rounded-xl bg-white/5 border border-white/10 text-white text-xs font-bold uppercase tracking-wider"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  disabled={actionLoading}
+                  className="w-1/2 py-3.5 rounded-xl bg-gradient-to-r from-brand-cyan to-brand-pink text-black font-extrabold text-xs uppercase tracking-widest shadow-[0_0_15px_rgba(0,240,255,0.2)]"
+                >
+                  {actionLoading ? 'POSTING...' : 'Post Reel'}
                 </button>
               </div>
             </form>
