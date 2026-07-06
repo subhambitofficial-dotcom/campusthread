@@ -69,8 +69,8 @@ router.post('/', authenticateToken, authorizeRoles('Super Admin'), async (req: A
 router.delete('/:id', authenticateToken, authorizeRoles('Super Admin'), async (req: any, res: Response) => {
   const { id } = req.params;
   try {
-    const result = await db.clubs.deleteOne({ id });
-    if (result.deletedCount === 0) {
+    const deletedClub = await db.clubs.findByIdAndDelete(id);
+    if (!deletedClub) {
       return res.status(404).json({ error: 'Club not found.' });
     }
     return res.json({ success: true });
