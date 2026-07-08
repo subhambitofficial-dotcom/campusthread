@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { api } from '../../../utils/api';
 import Link from 'next/link';
 import { Router } from 'next/router';
-import { Radio, Plus, Trash2, ArrowLeft, ShieldCheck, Sparkles, LayoutGrid, MonitorPlay, Save, Eye, Palette, CheckCircle, Info } from 'lucide-react';
+import { Radio, Plus, Trash2, ArrowLeft, ShieldCheck, Sparkles, LayoutGrid, MonitorPlay, Save, Eye, Palette, CheckCircle, Info, ShoppingBag } from 'lucide-react';
 
 export default function EventBuilder() {
   const [clubs, setClubs] = useState<any[]>([]);
@@ -506,38 +506,6 @@ export default function EventBuilder() {
                         </button>
                       </div>
                     ))}
-                    {/* Merchandise Items List */}
-                    {merchItems.length > 0 && (
-                      <div className="mt-4">
-                        <h3 className="text-sm font-bold text-white mb-2">Merchandise Items</h3>
-                        {merchItems.map((m) => (
-                          <div key={m.id} className="flex items-center justify-between p-2 bg-white/5 rounded mb-2">
-                            <span className="text-white text-xs">{m.name || m.title}</span>
-                            <button
-                              type="button"
-                              onClick={() => deleteMerch(m.id)}
-                              className="text-white/40 hover:text-brand-pink transition-colors"
-                            >
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
-                    {/* Events Items List */}
-                    {events.length > 0 && (
-                      <div className="mt-4">
-                        <h3 className="text-sm font-bold text-white mb-2">Events</h3>
-                        {events.map((e) => (
-                          <div key={e.id} className="flex items-center justify-between p-2 bg-white/5 rounded mb-2">
-                            <span className="text-white text-xs">{e.title || e.name}</span>
-                            <button type="button" onClick={() => deleteEvent(e.id)} className="text-white/40 hover:text-brand-pink transition-colors">
-                              <Trash2 className="w-4 h-4" />
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    )}
                   </div>
                 )}
 
@@ -623,6 +591,81 @@ export default function EventBuilder() {
                     + Add Sub-Event
                   </button>
                 </div>
+              </div>
+
+              {/* ================= MANAGE MERCHANDISE ================= */}
+              <div className="border-t border-white/5 pt-4 flex flex-col gap-3">
+                <label className="block text-[10px] font-bold text-white/50 uppercase tracking-widest flex items-center gap-1.5">
+                  <ShoppingBag className="w-3.5 h-3.5 text-brand-pink" /> Manage Merchandise Drops
+                </label>
+                {merchItems.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-white/30 border border-dashed border-white/10 rounded-xl">
+                    No merchandise published yet. Launch drops from the Control Hub.
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {merchItems.map((m) => (
+                      <div key={m.id || m._id} className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between gap-3">
+                        <div className="flex items-center gap-3 overflow-hidden">
+                          {m.images?.[0] && (
+                            <img src={m.images[0]} alt={m.title} className="w-9 h-9 rounded-lg object-cover border border-white/10 shrink-0" />
+                          )}
+                          <div className="overflow-hidden">
+                            <p className="text-xs font-bold text-white truncate">{m.title}</p>
+                            <p className="text-[10px] text-brand-pink">₹{m.price}</p>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => deleteMerch(m.id || m._id)}
+                          className="shrink-0 p-1.5 rounded-lg bg-brand-pink/10 hover:bg-brand-pink/20 border border-brand-pink/20 text-brand-pink transition-all"
+                          title="Delete merchandise"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* ================= MANAGE BUILT MICROSITES ================= */}
+              <div className="border-t border-white/5 pt-4 flex flex-col gap-3">
+                <label className="block text-[10px] font-bold text-white/50 uppercase tracking-widest flex items-center gap-1.5">
+                  <MonitorPlay className="w-3.5 h-3.5 text-brand-cyan" /> Manage Built Microsites
+                </label>
+                {events.length === 0 ? (
+                  <div className="p-4 text-center text-xs text-white/30 border border-dashed border-white/10 rounded-xl">
+                    No microsites built yet. Publish your first event above.
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {events.map((ev) => (
+                      <div key={ev.id || ev._id} className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between gap-3">
+                        <div className="overflow-hidden">
+                          <p className="text-xs font-bold text-white truncate">{ev.title}</p>
+                          <div className="flex items-center gap-2 mt-0.5">
+                            <span className="text-[10px] text-brand-cyan font-mono truncate">/{ev.slug}</span>
+                            <Link
+                              href={`/event/${ev.slug}`}
+                              className="text-[9px] text-white/40 hover:text-brand-cyan transition-colors uppercase tracking-wider"
+                            >
+                              Preview ↗
+                            </Link>
+                          </div>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => deleteEvent(ev.id || ev._id)}
+                          className="shrink-0 p-1.5 rounded-lg bg-brand-pink/10 hover:bg-brand-pink/20 border border-brand-pink/20 text-brand-pink transition-all"
+                          title="Delete microsite"
+                        >
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               {/* Submit visual publishing */}
