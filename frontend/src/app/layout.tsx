@@ -84,7 +84,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
             <Link href="/" className="flex items-center gap-2">
               <span className="text-2xl font-black bg-gradient-to-r from-brand-cyan via-brand-pink to-brand-purple bg-clip-text text-transparent tracking-tighter">
-                CAMPUSTHREAD
+                CAMPUSTHREADX
               </span>
               <span className="text-[10px] uppercase font-tech px-2 py-0.5 rounded-full border border-brand-cyan/20 text-brand-cyan tracking-wider hidden sm:inline-block">
                 Beta v1.0
@@ -223,10 +223,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <div className="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
             <div className="flex flex-col items-center md:items-start gap-1">
               <span className="text-lg font-extrabold tracking-tighter text-white">
-                CAMPUSTHREAD
+                CAMPUSTHREADX
               </span>
               <p className="text-xs text-white/40">
-                The Premium Digital Experience Layer of Campus Culture.
+                CULTURE TOGETHER XPERIENCE
               </p>
             </div>
             <div className="flex gap-8 text-xs text-white/60">
