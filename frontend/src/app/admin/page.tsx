@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { api } from '../../utils/api';
 import Link from 'next/link';
-import { Radio, Users, Calendar, ShoppingBag, PlusCircle, Sparkles, FolderSync, ShieldAlert, Award, FileText, CheckCircle2, X, Download, Landmark, Shirt, Film } from 'lucide-react';
+import { Radio, Users, Calendar, ShoppingBag, PlusCircle, Sparkles, FolderSync, ShieldAlert, Award, FileText, CheckCircle2, X, Download, Landmark, Shirt, Film, Trash2, MonitorPlay } from 'lucide-react';
 
 export default function AdminDashboard() {
   const [dbStats, setDbStats] = useState<any>({
@@ -17,6 +17,8 @@ export default function AdminDashboard() {
   const [orders, setOrders] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [notifications, setNotifications] = useState<any[]>([]);
+  const [merchProducts, setMerchProducts] = useState<any[]>([]);
+  const [events, setEvents] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Authenticated user state
@@ -80,6 +82,20 @@ export default function AdminDashboard() {
         setClubs(clubsList);
       } catch (clubErr) {
         console.error('Failed to load clubs list:', clubErr);
+      }
+
+      try {
+        const merch = await api.get('/merch');
+        setMerchProducts(merch);
+      } catch (mErr) {
+        console.error('Failed to load merch:', mErr);
+      }
+
+      try {
+        const evList = await api.get('/events');
+        setEvents(evList);
+      } catch (evErr) {
+        console.error('Failed to load events:', evErr);
       }
 
       // Fetch notifications or use dynamic summary
@@ -221,6 +237,30 @@ export default function AdminDashboard() {
       alert(err.message || 'Failed to post reel.');
     } finally {
       setActionLoading(false);
+    }
+  };
+
+  // Delete Merch Product
+  const handleDeleteMerch = async (id: string) => {
+    if (!window.confirm('Delete this merchandise product? This cannot be undone.')) return;
+    try {
+      await api.delete(`/admin/delete/merch/${id}`);
+      setMerchProducts(prev => prev.filter(m => (m.id || m._id) !== id));
+      fetchAdminStats();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete merchandise.');
+    }
+  };
+
+  // Delete Event / Microsite
+  const handleDeleteEvent = async (id: string) => {
+    if (!window.confirm('Delete this microsite? This cannot be undone.')) return;
+    try {
+      await api.delete(`/admin/delete/events/${id}`);
+      setEvents(prev => prev.filter(e => (e.id || e._id) !== id));
+      fetchAdminStats();
+    } catch (err: any) {
+      alert(err.message || 'Failed to delete event.');
     }
   };
 
@@ -457,8 +497,78 @@ export default function AdminDashboard() {
 
         </div>
 
-        {/* Column 3: Notifications & Events log */}
+        {/* Column 3: Merchandise, Microsites & Notifications */}
         <div className="flex flex-col gap-6 text-left">
+
+          {/* Merch Management Panel */}
+          <div className="glass p-6 rounded-2xl border border-white/5">
+            <h3 className="text-base font-bold mb-4 text-white tracking-tight flex items-center gap-2">
+              <ShoppingBag className="w-4 h-4 text-brand-pink" /> Merchandise Products
+            </h3>
+            {merchProducts.length === 0 ? (
+              <div className="p-4 text-center text-xs text-white/30 border border-dashed border-white/10 rounded-xl">
+                No merchandise launched yet.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {merchProducts.map((m) => (
+                  <div key={m.id || m._id} className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between gap-3">
+                    <div className="flex items-center gap-3 overflow-hidden">
+                      {m.images?.[0] && (
+                        <img src={m.images[0]} alt={m.title} className="w-8 h-8 rounded-lg object-cover border border-white/10 shrink-0" />
+                      )}
+                      <div className="overflow-hidden">
+                        <p className="text-xs font-bold text-white truncate">{m.title}</p>
+                        <p className="text-[10px] text-brand-pink">₹{m.price} · Stock: {m.stock}</p>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteMerch(m.id || m._id)}
+                      className="shrink-0 p-1.5 rounded-lg bg-brand-pink/10 hover:bg-brand-pink/20 border border-brand-pink/20 text-brand-pink transition-all"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Microsites Management Panel */}
+          <div className="glass p-6 rounded-2xl border border-white/5">
+            <h3 className="text-base font-bold mb-4 text-white tracking-tight flex items-center gap-2">
+              <MonitorPlay className="w-4 h-4 text-brand-cyan" /> Live Microsites
+            </h3>
+            {events.length === 0 ? (
+              <div className="p-4 text-center text-xs text-white/30 border border-dashed border-white/10 rounded-xl">
+                No microsites published yet.
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {events.map((ev) => (
+                  <div key={ev.id || ev._id} className="p-3 rounded-xl bg-white/5 border border-white/5 flex items-center justify-between gap-3">
+                    <div className="overflow-hidden">
+                      <p className="text-xs font-bold text-white truncate">{ev.title}</p>
+                      <div className="flex items-center gap-2 mt-0.5">
+                        <span className="text-[10px] text-brand-cyan font-mono truncate">/{ev.slug}</span>
+                        <Link href={`/event/${ev.slug}`} className="text-[9px] text-white/40 hover:text-brand-cyan uppercase tracking-wider">Preview ↗</Link>
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => handleDeleteEvent(ev.id || ev._id)}
+                      className="shrink-0 p-1.5 rounded-lg bg-brand-pink/10 hover:bg-brand-pink/20 border border-brand-pink/20 text-brand-pink transition-all"
+                      title="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Notifications */}
           <div className="flex items-center gap-2">
             <Sparkles className="w-5 h-5 text-brand-gold" />
             <h3 className="text-xl font-bold text-white tracking-tight">Active Node Feed</h3>
