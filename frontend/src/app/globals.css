@@ -108,3 +108,36 @@ h1, h2, h3, h4, h5, h6 {
 .text-glow {
   text-shadow: 0 0 10px currentColor;
 }
+
+/* ============================================================
+   GLOBAL DARK DROPDOWN / SELECT OVERRIDES
+   Prevents browser from rendering solid white native dropdowns
+   ============================================================ */
+select {
+  background-color: #0e0f1a !important;
+  color: #ffffff !important;
+  border-color: rgba(255, 255, 255, 0.1) !important;
+  color-scheme: dark;
+}
+
+select option {
+  background-color: #0e0f1a !important;
+  color: #ffffff !important;
+}
+
+select option:hover,
+select option:focus,
+select option:active,
+select option:checked {
+  background-color: #1a1c2e !important;
+  color: #00f0ff !important;
+}
+
+/* Fix dialog / popup overlay background */
+dialog,
+[role="dialog"],
+[role="listbox"],
+[role="combobox"] {
+  background-color: #0e0f1a !important;
+  color: #ffffff !important;
+}
