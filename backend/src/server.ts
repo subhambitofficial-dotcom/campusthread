@@ -59,9 +59,9 @@ app.use((err: any, req: express.Request, res: express.Response, next: express.Ne
 const startServer = async () => {
   // Connect to Database (MongoDB or fallback JSON)
   await connectDB();
-  
+
   // Seed Database instantly on boot to populate events/merch/users
-  await seed();
+  //await seed();
 
   app.listen(PORT, () => {
     console.log(`===============================================`);
