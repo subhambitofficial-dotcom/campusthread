@@ -216,6 +216,15 @@
       "content": "Experience the digital layer of modern campus culture. Explore clubs, customize event microsites, and secure limited drops.",
       "type": "general",
       "targetId": "welcome"
+    },
+    {
+      "_id": "wyd4dllhb",
+      "id": "wyd4dllhb",
+      "createdAt": "2026-08-02T18:40:58.623Z",
+      "title": "New Video Reel Drop: dwa",
+      "content": "A new video reel has been posted by Alex Rivera.",
+      "type": "general",
+      "targetId": "eljj0phsh"
     }
   ],
   "reels": [
@@ -248,6 +257,17 @@
       "clubId": null,
       "postedBy": "Super Admin",
       "likes": []
+    },
+    {
+      "_id": "eljj0phsh",
+      "id": "eljj0phsh",
+      "createdAt": "2026-08-02T18:40:58.621Z",
+      "title": "dwa",
+      "videoUrl": "https://youtube.com/shorts/4QLOMgP3T98?si=nBYJMfSN5Rldd56v",
+      "clubId": null,
+      "postedBy": "Alex Rivera",
+      "likes": [],
+      "updatedAt": "2026-08-02T18:41:32.823Z"
     }
   ]
 }
