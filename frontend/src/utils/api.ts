@@ -66,6 +66,7 @@ export const api = {
             localStorage.removeItem('campusthread_token');
             localStorage.removeItem('campusthread_user');
           }
+          throw new Error('Your session has expired or is invalid. Please click "Enter Campus" to log in again.');
         }
         throw new Error(data.error || 'Something went wrong with the request.');
       }
