@@ -5,6 +5,64 @@ import { api } from '../../utils/api';
 import Link from 'next/link';
 import { Calendar, MapPin, Users, Flame, Info, CheckCircle, Tag, ArrowRight, Film, Play, Volume2, VolumeX, Heart, ChevronLeft, ChevronRight, Trash2, X } from 'lucide-react';
 
+// ─── Smart Video URL Converter ───────────────────────────────────────────────
+// Converts any YouTube / Instagram / Facebook share link into a proper embed URL.
+// Returns { embedUrl, type } where type is 'iframe' or 'video'
+function getVideoEmbed(rawUrl: string): { embedUrl: string; type: 'iframe' | 'video'; thumbnail: string } {
+  if (!rawUrl) return { embedUrl: '', type: 'video', thumbnail: '' };
+
+  // ── YouTube ──────────────────────────────────────────────────────────────
+  // Handles: youtu.be/ID, youtube.com/watch?v=ID, youtube.com/shorts/ID,
+  //          youtube.com/embed/ID, m.youtube.com/watch?v=ID (including ?si=... parameters)
+  const ytShort = rawUrl.match(/youtu\.be\/([^?&/#]+)/);
+  const ytWatch = rawUrl.match(/[?&]v=([^?&/#]+)/);
+  const ytShorts = rawUrl.match(/\/shorts\/([^?&/#]+)/);
+  const ytEmbed = rawUrl.match(/\/embed\/([^?&/#]+)/);
+  const ytId = (ytShort?.[1] || ytWatch?.[1] || ytShorts?.[1] || ytEmbed?.[1]) ?? null;
+  if (ytId) {
+    return {
+      embedUrl: `https://www.youtube.com/embed/${ytId}?autoplay=1&loop=1&mute=1&playsinline=1&controls=1&rel=0`,
+      type: 'iframe',
+      thumbnail: `https://img.youtube.com/vi/${ytId}/hqdefault.jpg`,
+    };
+  }
+
+  // ── Instagram ────────────────────────────────────────────────────────────
+  // Handles: instagram.com/p/CODE, instagram.com/reel/CODE, instagram.com/tv/CODE
+  const igMatch = rawUrl.match(/instagram\.com\/(p|reel|tv)\/([\w-]+)/);
+  if (igMatch) {
+    return {
+      embedUrl: `https://www.instagram.com/${igMatch[1]}/${igMatch[2]}/embed/`,
+      type: 'iframe',
+      thumbnail: '',
+    };
+  }
+
+  // ── Facebook ─────────────────────────────────────────────────────────────
+  // Handles: facebook.com/watch?v=ID, fb.watch/CODE, facebook.com/reel/ID
+  const fbWatch = rawUrl.match(/facebook\.com\/watch[\/?].*[?&]v=(\d+)/);
+  const fbReel = rawUrl.match(/facebook\.com\/reel\/(\d+)/);
+  const fbShort = rawUrl.match(/fb\.watch\/([\w-]+)/);
+  if (fbWatch || fbReel) {
+    const fbId = fbWatch?.[1] || fbReel?.[1];
+    return {
+      embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(rawUrl)}&width=400&show_text=false&appId`,
+      type: 'iframe',
+      thumbnail: '',
+    };
+  }
+  if (fbShort) {
+    return {
+      embedUrl: `https://www.facebook.com/plugins/video.php?href=${encodeURIComponent(rawUrl)}&width=400&show_text=false`,
+      type: 'iframe',
+      thumbnail: '',
+    };
+  }
+
+  // ── Direct video file (mp4, webm, base64, blob, etc.) ────────────────────
+  return { embedUrl: rawUrl, type: 'video', thumbnail: '' };
+}
+
 export default function Feed() {
   const [events, setEvents] = useState<any[]>([]);
   const [clubs, setClubs] = useState<any[]>([]);
@@ -113,12 +171,31 @@ export default function Feed() {
                   onClick={() => setActiveReelIndex(index)}
                   className="relative w-36 h-60 rounded-2xl border border-white/10 overflow-hidden shrink-0 cursor-pointer group hover:border-brand-gold/50 transition-all duration-300 shadow-lg hover:scale-105"
                 >
-                  <video 
-                    src={reel.videoUrl} 
-                    className="w-full h-full object-cover pointer-events-none brightness-[0.7] group-hover:brightness-[0.8] group-hover:scale-105 transition-all duration-500"
-                    preload="metadata"
-                    muted
-                  />
+                  {/* Smart thumbnail: use YouTube thumbnail image, platform icon, or video element */}
+                  {(() => {
+                    const { type, thumbnail } = getVideoEmbed(reel.videoUrl);
+                    if (type === 'iframe') {
+                      return thumbnail ? (
+                        <img
+                          src={thumbnail}
+                          alt={reel.title}
+                          className="w-full h-full object-cover pointer-events-none brightness-[0.7] group-hover:brightness-[0.9] group-hover:scale-105 transition-all duration-500"
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-zinc-900 to-zinc-800 flex items-center justify-center">
+                          <Film className="w-10 h-10 text-white/20" />
+                        </div>
+                      );
+                    }
+                    return (
+                      <video
+                        src={reel.videoUrl}
+                        className="w-full h-full object-cover pointer-events-none brightness-[0.7] group-hover:brightness-[0.8] group-hover:scale-105 transition-all duration-500"
+                        preload="metadata"
+                        muted
+                      />
+                    );
+                  })()}
                   <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-black/30" />
 
                   <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
@@ -361,15 +438,32 @@ export default function Feed() {
 
           {/* Core Player Frame */}
           <div className="relative w-full max-w-sm h-[85vh] rounded-3xl overflow-hidden border border-white/10 bg-zinc-950 flex flex-col justify-between shadow-2xl animate-float">
-            {/* The active video component */}
-            <video 
-              key={reels[activeReelIndex].id || reels[activeReelIndex]._id}
-              src={reels[activeReelIndex].videoUrl}
-              className="absolute inset-0 w-full h-full object-cover"
-              autoPlay
-              loop
-              muted={isMuted}
-            />
+            {/* Smart player: iframe for embed links, video for direct files */}
+            {(() => {
+              const { embedUrl, type } = getVideoEmbed(reels[activeReelIndex].videoUrl);
+              if (type === 'iframe') {
+                return (
+                  <iframe
+                    key={reels[activeReelIndex].id || reels[activeReelIndex]._id}
+                    src={embedUrl}
+                    className="absolute inset-0 w-full h-full"
+                    allow="autoplay; fullscreen; picture-in-picture"
+                    allowFullScreen
+                    style={{ border: 'none' }}
+                  />
+                );
+              }
+              return (
+                <video
+                  key={reels[activeReelIndex].id || reels[activeReelIndex]._id}
+                  src={embedUrl}
+                  className="absolute inset-0 w-full h-full object-cover"
+                  autoPlay
+                  loop
+                  muted={isMuted}
+                />
+              );
+            })()}
 
             {/* Dark overlay gradients */}
             <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-transparent to-black/80 pointer-events-none" />
